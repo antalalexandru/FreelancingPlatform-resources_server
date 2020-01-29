@@ -4,32 +4,36 @@ import org.springframework.data.jpa.domain.Specification;
 import resources.data.entity.Project;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ProjectSpecificationBuilder {
 
-    private final List<SearchCriteria> params;
+    public static Specification<Project> build(String query) {
+        List<Specification<Project>> specifications = new ArrayList<>();
 
-    public ProjectSpecificationBuilder() {
-        params = new ArrayList<SearchCriteria>();
-    }
+        Pattern pattern = Pattern.compile("(\\w+?)(:|<|>)(\\w+?),");
+        Matcher matcher = pattern.matcher(query + ",");
+        while (matcher.find()) {
+            Object value;
+            if ("tags".equalsIgnoreCase(matcher.group(1))) {
+                value = matcher.group(3);
+            } else {
+                // custom mapping for tags attribute
+                value = new HashSet<>(Arrays.asList(matcher.group(3).split(",")));
+            }
+            specifications.add(new ProjectSpecification(new SearchCriteria(matcher.group(1), matcher.group(2), value)));
+        }
 
-    public ProjectSpecificationBuilder with(String key, String operation, Object value) {
-        params.add(new SearchCriteria(key, operation, value));
-        return this;
-    }
-
-    public Specification<Project> build() {
-        if (params.size() == 0) {
+        if (specifications.size() == 0) {
             return null;
         }
-        List<Specification> specs = params.stream()
-                .map(ProjectSpecification::new)
-                .collect(Collectors.toList());
-        Specification result = specs.get(0);
-        for (int i = 1; i < params.size(); i++) {
-            result = Specification.where(result).and(specs.get(i));
+        Specification<Project> result = specifications.get(0);
+        for (int i = 1; i < specifications.size(); i++) {
+            result = Specification.where(result).and(specifications.get(i));
         }
         return result;
     }

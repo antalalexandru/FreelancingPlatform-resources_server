@@ -18,16 +18,22 @@ public class ProjectSpecification implements Specification<Project> {
     public Predicate toPredicate(Root<Project> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         if (searchCriteria.getOperation().equalsIgnoreCase(">")) {
             return criteriaBuilder.greaterThanOrEqualTo(root.get(searchCriteria.getKey()), searchCriteria.getValue().toString());
-        } else if (searchCriteria.getOperation().equalsIgnoreCase("<")) {
+        }
+
+        if (searchCriteria.getOperation().equalsIgnoreCase("<")) {
             return criteriaBuilder.lessThanOrEqualTo(root.get(searchCriteria.getKey()), searchCriteria.getValue().toString());
-        } else if (searchCriteria.getOperation().equalsIgnoreCase(":")) {
+        }
+
+        if (searchCriteria.getOperation().equalsIgnoreCase(":")) {
             if (root.get(searchCriteria.getKey()).getJavaType() == String.class) {
                 return criteriaBuilder.like(root.get(searchCriteria.getKey()), "%" + searchCriteria.getValue() + "%");
-            } else if (root.get(searchCriteria.getKey()).getJavaType() == Set.class) {
-                return root.join("tags").get("name").in(searchCriteria.getValue());
-            } else {
-                return criteriaBuilder.equal(root.get(searchCriteria.getKey()), searchCriteria.getValue());
             }
+
+            if (root.get(searchCriteria.getKey()).getJavaType() == Set.class) {
+                return root.join("tags").get("name").in(searchCriteria.getValue());
+            }
+
+            return criteriaBuilder.equal(root.get(searchCriteria.getKey()), searchCriteria.getValue());
         }
         return null;
     }
