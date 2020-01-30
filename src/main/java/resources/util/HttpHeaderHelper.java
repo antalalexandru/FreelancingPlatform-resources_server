@@ -22,8 +22,7 @@ public class HttpHeaderHelper {
     public HttpHeaders getLoginHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.add(CONTENT, CONTENT_TYPE);
-        String auth = clientId + ":" + clientSecret;
-        headers.add(AUTHORIZATION, BASIC + Base64.getEncoder().encodeToString(auth.getBytes()));
+        headers.setBasicAuth(clientId, clientSecret);
 
         return headers;
     }
