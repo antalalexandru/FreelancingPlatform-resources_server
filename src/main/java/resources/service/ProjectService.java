@@ -46,7 +46,7 @@ public class ProjectService {
 
         return PaginatedResponse.<ProjectDTO>builder()
                 .page(pageNumber)
-                .count(itemsPerPage)
+                .count(projectDTOList.size())
                 .total(total)
                 .members(projectDTOList)
                 .build();
