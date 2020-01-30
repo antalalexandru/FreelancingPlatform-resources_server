@@ -20,10 +20,10 @@ public class ProjectSpecificationBuilder {
         while (matcher.find()) {
             Object value;
             if ("tags".equalsIgnoreCase(matcher.group(1))) {
-                value = matcher.group(3);
-            } else {
                 // custom mapping for tags attribute
                 value = new HashSet<>(Arrays.asList(matcher.group(3).split(",")));
+            } else {
+                value = matcher.group(3);
             }
             specifications.add(new ProjectSpecification(new SearchCriteria(matcher.group(1), matcher.group(2), value)));
         }
