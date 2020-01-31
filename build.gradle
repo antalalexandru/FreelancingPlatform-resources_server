@@ -16,7 +16,9 @@ dependencies {
 
     compile group: 'de.sven-jacobs', name: 'loremipsum', version: '1.0'
 
-
+    compile('javax.xml.bind:jaxb-api:2.3.0')
+    compile('javax.activation:activation:1.1')
+    compile('org.glassfish.jaxb:jaxb-runtime:2.3.0')
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.1.0.RELEASE'
     // https://mvnrepository.com/artifact/org.springframework/spring-jdbc
@@ -26,13 +28,15 @@ dependencies {
     // https://mvnrepository.com/artifact/org.eclipse.persistence/javax.persistence
     compile group: 'org.eclipse.persistence', name: 'javax.persistence', version: '2.2.1'
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
-    // compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.1.2.RELEASE'
+     compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.1.2.RELEASE'
     // https://mvnrepository.com/artifact/org.springframework.security.oauth/spring-security-oauth2
-    // compile group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version: '2.3.4.RELEASE'
+     compile group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version: '2.3.4.RELEASE'
     // https://mvnrepository.com/artifact/org.springframework.data/spring-data-jpa
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.1.0.RELEASE'
     // https://mvnrepository.com/artifact/commons-lang/commons-lang
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '1.2.0.RELEASE'
     // https://mvnrepository.com/artifact/org.springframework.security/spring-security-jwt
     // compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.10.RELEASE'
 
