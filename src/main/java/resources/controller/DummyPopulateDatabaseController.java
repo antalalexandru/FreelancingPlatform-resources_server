@@ -1,6 +1,10 @@
 package resources.controller;
 
 import de.svenjacobs.loremipsum.LoremIpsum;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,8 +45,8 @@ public class DummyPopulateDatabaseController {
 
             Project project = new Project();
 
-            project.setName(loremIpsum.getWords(ThreadLocalRandom.current().nextInt(30)));
-            project.setDescription(loremIpsum.getParagraphs(ThreadLocalRandom.current().nextInt(4)));
+            project.setName(LoremIpsumUtils.getRandomSentence(5 + ThreadLocalRandom.current().nextInt(7)));
+            project.setDescription(LoremIpsumUtils.getRandomParagraphs(1 + ThreadLocalRandom.current().nextInt(10)));
             project.setAuthorId(1);
             project.setEnrolled(ThreadLocalRandom.current().nextInt(100));
             project.setSubmitted(new Date(ThreadLocalRandom.current().nextLong(
@@ -80,6 +84,23 @@ public class DummyPopulateDatabaseController {
         }
     }
 
+    private static final class LoremIpsumUtils {
+        private static final LoremIpsum loremIpsum = new LoremIpsum();
 
+        private static String getRandomSentence(final int wordsCount) {
+            List<String> words = new ArrayList<>(Arrays.asList(
+                  loremIpsum.getWords(wordsCount, ThreadLocalRandom.current().nextInt(40)).split(" "))
+            ).stream().map(String::toLowerCase).collect(Collectors.toList());
+            Collections.shuffle(words);
+            return StringUtils.capitalize(String.join(" ", words));
+        }
+
+        private static String getRandomParagraphs(final int paragraphsCount) {
+            return "<p>" + IntStream.range(0, paragraphsCount)
+                  .mapToObj(val -> getRandomSentence(5 + ThreadLocalRandom.current().nextInt(20)))
+                  .collect(Collectors.joining("</p><p>")) + "</p>";
+        }
+
+    }
 
 }

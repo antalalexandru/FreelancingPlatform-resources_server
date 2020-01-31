@@ -3,6 +3,8 @@ package resources.controller;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +30,17 @@ public class UserController {
 
     @PostMapping("/signup")
     public void signup() {
+    }
 
+    @GetMapping("/unauthenticated")
+    public String simple() {
+        return "OK!";
+    }
+
+    @GetMapping("/authenticated")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String requestAuth() {
+        return "OK!";
     }
 
 }

@@ -22,6 +22,7 @@ public class ProjectDTOConverter implements Converter<Project, ProjectDTO> {
                 .endDate(project.getEndDate())
                 .paymentLowerBound(project.getPaymentLowerBound())
                 .paymentUpperBound(project.getPaymentUpperBound())
+
                 .build();
     }
 }
