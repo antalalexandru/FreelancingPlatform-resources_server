@@ -12,6 +12,5 @@ import javax.validation.constraints.NotBlank;
 public class ActivationTokenRequestDTO {
     @NotBlank
     private String token;
-    @NotBlank
     private Long userId;
 }

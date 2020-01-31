@@ -78,15 +78,15 @@ public final class UserService {
     }
 
     public void register(final UserRequestDTO userDTO) {
-        final User user = conversionService.convert(userDTO, User.class);
-        final ActivationToken activationToken = ActivationToken.builder()
-                .token(UUID.randomUUID().toString())
-                .userId(user.getId())
-                .build();
         Optional<User> userFound = userRepository.findByUsernameEqualsOrEmailEquals(userDTO.getUsername(), userDTO.getEmail());
+        final User user = conversionService.convert(userDTO, User.class);
 
         if (!userFound.isPresent()) {
             User savedUser = userRepository.save(user);
+            final ActivationToken activationToken = ActivationToken.builder()
+                    .token(UUID.randomUUID().toString())
+                    .userId(savedUser.getId())
+                    .build();
             activationTokenRepository.save(activationToken);
             this.emailService.sendActivationEmail(savedUser.getEmail(), savedUser.getId(), activationToken.getToken());
         } else {
