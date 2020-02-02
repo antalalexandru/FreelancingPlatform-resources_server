@@ -1,16 +1,24 @@
 package resources.controller;
 
-import de.svenjacobs.loremipsum.LoremIpsum;
+import com.thedeanda.lorem.Lorem;
+import com.thedeanda.lorem.LoremIpsum;
+import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import resources.data.entity.Application;
+import resources.data.entity.Group;
 import resources.data.entity.Project;
 import resources.data.entity.Tag;
+import resources.data.entity.User;
+import resources.data.repository.ApplicationRepository;
 import resources.data.repository.ProjectRepository;
 import resources.data.repository.TagRepository;
+import resources.data.repository.UserRepository;
 
-import java.sql.Date;
+import java.util.Date;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -30,20 +38,32 @@ public class DummyPopulateDatabaseController {
     @Autowired
     private ProjectRepository projectRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ApplicationRepository applicationRepository;
+
     @PostMapping("/project")
     public void populateDatabaseWithProjects() {
 
-        LoremIpsum loremIpsum = new LoremIpsum();
+        Lorem lorem = LoremIpsum.getInstance();
 
         List<Tag> tags = new ArrayList<>(tagRepository.findAll());
+        List<User> users = new ArrayList<>(userRepository.findAll());
 
-        for(int i = 0; i < 100; i++) {
+        for(int i = 0; i < 1275; i++) {
+
+            Collections.shuffle(users);
 
             Project project = new Project();
 
-            project.setName(loremIpsum.getWords(ThreadLocalRandom.current().nextInt(30)));
-            project.setDescription(loremIpsum.getParagraphs(ThreadLocalRandom.current().nextInt(4)));
-            project.setAuthorId(1);
+            project.setName(lorem.getWords(5, 15));
+            project.setDescription(lorem.getHtmlParagraphs(5, 10));
+            project.setAuthor(users.get(0));
             project.setEnrolled(ThreadLocalRandom.current().nextInt(100));
             project.setSubmitted(new Date(ThreadLocalRandom.current().nextLong(
                     Instant.now().minus(Duration.ofDays(40)).getEpochSecond(),
@@ -75,11 +95,48 @@ public class DummyPopulateDatabaseController {
                 project.setTags(tagsSet);
             }
 
+            List<Application> applications = new ArrayList<>();
 
-            projectRepository.save(project);
+            Project savedProject = projectRepository.save(project);
+
+            for (int j = 0; j < project.getEnrolled(); j++) {
+                applications.add(Application.builder()
+                        .date(new Date())
+                        .description(lorem.getHtmlParagraphs(2, 4))
+                        .projectId(savedProject.getId())
+                        .user(users.get(j + 1))
+                        .build());
+            }
+
+            List<Application> savedApplications = applicationRepository.saveAll(applications);
+
+            if (Math.random() < 0.2) {
+                Collections.shuffle(savedApplications);
+                savedProject.setSelectedApplication(savedApplications.get(0));
+                projectRepository.save(savedProject);
+            }
+
         }
     }
 
+    @PostMapping("/user")
+    public void populateDatabaseWithUsers() {
+        List<User> users = new ArrayList<>();
+        for(int i = 100; i < 10000; i++) {
+            users.add(User.builder()
+                    .username(generateRandomUsername())
+                    .email("inexistent_email_" + i + "@wlg.ro")
+                    .group(Group.builder().id(2).build())
+                    .is_enabled(true)
+                    .password(passwordEncoder.encode("1234"))
+                    .build());
+        }
+        userRepository.saveAll(users);
+    }
 
+    private static String generateRandomUsername() {
+        int length = 5 + ThreadLocalRandom.current().nextInt(15);
+        return RandomStringUtils.random(length, true, false);
+    }
 
 }

@@ -19,6 +19,10 @@ public class AuthenticationResponseDTO {
     @JsonProperty("expires_in")
     private int availableTime;
 
+    @JsonProperty("user_id")
+    private long userId;
+
+
     private String scope;
 
     private String roles;

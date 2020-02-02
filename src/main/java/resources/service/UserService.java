@@ -27,16 +27,19 @@ import java.util.UUID;
 
 @Service
 public final class UserService {
+
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
     private static final String GRANT_TYPE = "grant_type";
     private static final String LOGIN_PATH = "/oauth/token";
+
     private RestTemplate restTemplate;
     private HttpHeaderHelper httpHeaderHelper;
     private UserRepository userRepository;
     private ActivationTokenRepository activationTokenRepository;
     private ConversionService conversionService;
     private EmailService emailService;
+
     @Value("${AUTH_SERVER_PROTOCOL:http}")
     private String authorizationServerProtocol;
 
