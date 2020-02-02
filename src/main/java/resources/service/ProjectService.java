@@ -13,11 +13,13 @@ import resources.data.converter.ProjectDTOConverter;
 import resources.data.dto.ApplicationDTO;
 import resources.data.dto.PaginatedResponse;
 import resources.data.dto.ProjectDTO;
+import resources.data.dto.UserDTO;
 import resources.data.entity.Application;
 import resources.data.entity.Project;
 import resources.data.repository.ApplicationRepository;
 import resources.data.repository.ProjectRepository;
 import resources.data.specitications.ProjectSpecificationBuilder;
+import resources.exceptions.BadRequestException;
 
 import java.util.Date;
 import java.util.Calendar;
@@ -124,5 +126,29 @@ public class ProjectService extends AuthenticationAwareService {
                 .total(applicationRepository.countByProjectIdEquals(projectId))
                 .members(applications)
                 .build();
+    }
+
+    /**
+     * Check if the authenticated user is able to apply to the given project id
+     * @param projectId the project id
+     * @throws BadRequestException if the user is not allowed to apply to the provided
+     * project (it's either closed, an application was already selected, or the authenticated user is the project
+     * author, or the project does not exist :-) ).
+     */
+    public void checkIfAbleToApply(long projectId) {
+        Project project = projectRepository.findByIdEquals(projectId).orElseThrow(() -> new BadRequestException("Project does not exist!"));
+        if (project.getSelectedApplication() != null) {
+            throw new BadRequestException("An application was already selected for this project.");
+        }
+        if (project.getEndDate().before(new Date())) {
+            throw new BadRequestException("The project end date is before the current date.");
+        }
+        long authenticatedUserId = getAuthenticatedUserDTO().getId();
+        if (project.getAuthor().getId() == authenticatedUserId) {
+            throw new BadRequestException("You cannot apply to your own projects.");
+        }
+        if (applicationRepository.countAllByProjectIdEqualsAndUserIdEquals(projectId, authenticatedUserId) > 0) {
+            throw new BadRequestException("You already applied to this project.");
+        }
     }
 }

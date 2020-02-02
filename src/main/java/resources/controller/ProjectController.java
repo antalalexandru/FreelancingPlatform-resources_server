@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import resources.data.dto.ApplicationDTO;
 import resources.data.dto.PaginatedResponse;
 import resources.data.dto.ProjectDTO;
-import resources.data.entity.Application;
 import resources.service.ProjectService;
 
 import javax.validation.Valid;
@@ -46,14 +45,14 @@ public class ProjectController {
         return projectService.createProject(projectDTO);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     public ProjectDTO getProjectDetails(@PathVariable("id") long id) {
         return projectService.getProjectDetails(id);
     }
 
-    @PostMapping("/{id}/application")
+    @PostMapping("{id}/application")
     @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")
-    public ApplicationDTO appliyToProject(@PathVariable("id") long projectId, @RequestBody @Valid ApplicationDTO applicationDTO) {
+    public ApplicationDTO applyToProject(@PathVariable("id") long projectId, @RequestBody @Valid ApplicationDTO applicationDTO) {
         return projectService.applyToProject(projectId, applicationDTO);
     }
 
@@ -64,5 +63,11 @@ public class ProjectController {
             @RequestParam(value = "count", required = false, defaultValue = "20") @Valid @Min(1) @Max(30) int count) {
 
         return projectService.getProjectApplications(projectId, page, count);
+    }
+
+    @GetMapping("{id}/can_post_application")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")
+    public void checkIfAbleToPost(@PathVariable("id") long projectId) {
+        projectService.checkIfAbleToApply(projectId);
     }
 }
