@@ -1,15 +1,8 @@
 package resources.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import resources.data.dto.ActivationTokenRequestDTO;
-import resources.data.dto.AuthenticationRequestDTO;
-import resources.data.dto.AuthenticationResponseDTO;
-import resources.data.dto.UserRequestDTO;
+import org.springframework.web.bind.annotation.*;
+import resources.data.dto.*;
 import resources.service.UserService;
 
 import javax.validation.Valid;
@@ -39,4 +32,15 @@ public class UserController {
     public void activate(@RequestBody @Valid ActivationTokenRequestDTO activationTokenRequestDTO) {
         userService.activate(activationTokenRequestDTO);
     }
+
+    @GetMapping("/forgotPassword")
+    public void forgotPassword(@RequestParam("keyword") String keyword) {
+        userService.forgotPassword(keyword);
+    }
+
+    @PostMapping("/reset")
+    public void resetPassword(@RequestBody ResetPasswordRequestDTO request) {
+        userService.resetPassword(request);
+    }
+
 }
