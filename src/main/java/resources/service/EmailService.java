@@ -10,9 +10,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class EmailService {
     @Value("${spring.mail.default-message}")
-    private String defaultMessage;
+    private String defaultActivationMessage;
     @Value("${spring.mail.default-subject}")
-    private String defaultSubject;
+    private String defaultActivationSubject;
+    @Value("${activation.default-message}")
+    private String defaultResetMessage;
+    @Value("${activation.default-subject}")
+    private String defaultResetSubject;
 
     public JavaMailSender emailSender;
 
@@ -24,11 +28,20 @@ public class EmailService {
     @Async
     public void sendActivationEmail(String to, Long userId, String token) {
         SimpleMailMessage message = new SimpleMailMessage();
-        String body = defaultMessage + " userID = " + userId + " token = " + token;
+        String body = defaultActivationMessage + " userID = " + userId + " token = " + token;
         message.setTo(to);
-        message.setSubject(defaultSubject);
+        message.setSubject(defaultActivationSubject);
         message.setText(body);
         emailSender.send(message);
+    }
 
+    @Async
+    public void sendResetEmail(String to, Long userId, String token) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        String body = defaultResetMessage + " userID = " + userId + " token = " + token;
+        message.setTo(to);
+        message.setSubject(defaultResetSubject);
+        message.setText(body);
+        emailSender.send(message);
     }
 }

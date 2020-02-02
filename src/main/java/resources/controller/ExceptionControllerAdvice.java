@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import resources.exceptions.BadRequestException;
 import resources.exceptions.ErrorResponse;
 import resources.exceptions.InvalidCredentialsException;
 
@@ -17,6 +18,11 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler({InvalidCredentialsException.class})
     public ResponseEntity<?> handleException(InvalidCredentialsException exception) {
         return responseEntity(HttpStatus.UNAUTHORIZED, exception);
+    }
+
+    @ExceptionHandler({BadRequestException.class})
+    public ResponseEntity<?> handleException(BadRequestException exception) {
+        return responseEntity(HttpStatus.BAD_REQUEST, exception);
     }
 
     @ExceptionHandler({SQLIntegrityConstraintViolationException.class})
