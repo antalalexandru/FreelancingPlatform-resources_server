@@ -1,16 +1,21 @@
 package resources.controller;
 
 import de.svenjacobs.loremipsum.LoremIpsum;
+import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import resources.data.entity.Group;
 import resources.data.entity.Project;
 import resources.data.entity.Tag;
+import resources.data.entity.User;
 import resources.data.repository.ProjectRepository;
 import resources.data.repository.TagRepository;
+import resources.data.repository.UserRepository;
 
-import java.sql.Date;
+import java.util.Date;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -30,9 +35,15 @@ public class DummyPopulateDatabaseController {
     @Autowired
     private ProjectRepository projectRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @PostMapping("/project")
     public void populateDatabaseWithProjects() {
-
+/*
         LoremIpsum loremIpsum = new LoremIpsum();
 
         List<Tag> tags = new ArrayList<>(tagRepository.findAll());
@@ -77,9 +88,25 @@ public class DummyPopulateDatabaseController {
 
 
             projectRepository.save(project);
+        }*/
+    }
+
+    @PostMapping("/user")
+    public void populateDatabaseWithUsers() {
+        for(int i = 0; i < 100; i++) {
+            userRepository.save(User.builder()
+                    .username(generateRandomUsername())
+                    .email("inexistent_email_" + i + "@wlg.ro")
+                    .group(Group.builder().id(2).build())
+                    .is_enabled(true)
+                    .password(passwordEncoder.encode("1234"))
+                    .build());
         }
     }
 
-
+    private static String generateRandomUsername() {
+        int length = 5 + ThreadLocalRandom.current().nextInt(10);
+        return RandomStringUtils.random(length, true, false);
+    }
 
 }

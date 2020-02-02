@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class UserRequestDTOToUserConverter implements Converter<UserRequestDTO, User> {
-    private static final long DEFAULT_GROUP = 1;
+    private static final long DEFAULT_GROUP = 2;
     @Autowired
     private PasswordEncoder passwordEncoder;
 

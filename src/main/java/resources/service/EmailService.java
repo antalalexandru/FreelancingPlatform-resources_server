@@ -13,6 +13,7 @@ public class EmailService {
     private String defaultMessage;
     @Value("${spring.mail.default-subject}")
     private String defaultSubject;
+
     public JavaMailSender emailSender;
 
     @Autowired
