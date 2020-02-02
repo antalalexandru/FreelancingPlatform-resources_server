@@ -36,6 +36,7 @@ public class ProjectConverter implements Converter<Project, ProjectDTO> {
                 .endDate(project.getEndDate())
                 .paymentLowerBound(project.getPaymentLowerBound())
                 .paymentUpperBound(project.getPaymentUpperBound())
+                .enrolled(project.getEnrolled())
                 .build();
     }
 }
