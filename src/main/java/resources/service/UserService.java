@@ -6,18 +6,19 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import resources.data.dto.ActivationTokenRequestDTO;
-import resources.data.dto.AuthenticationRequestDTO;
-import resources.data.dto.AuthenticationResponseDTO;
-import resources.data.dto.UserRequestDTO;
+import resources.data.dto.*;
 import resources.data.entity.ActivationToken;
+import resources.data.entity.ResetToken;
 import resources.data.entity.User;
 import resources.data.repository.ActivationTokenRepository;
+import resources.data.repository.ResetTokenRepository;
 import resources.data.repository.UserRepository;
+import resources.exceptions.BadRequestException;
 import resources.exceptions.InvalidCredentialsException;
 import resources.exceptions.UserAlreadyExistsException;
 import resources.util.HttpHeaderHelper;
@@ -37,8 +38,10 @@ public final class UserService {
     private HttpHeaderHelper httpHeaderHelper;
     private UserRepository userRepository;
     private ActivationTokenRepository activationTokenRepository;
+    private ResetTokenRepository resetTokenRepository;
     private ConversionService conversionService;
     private EmailService emailService;
+    private PasswordEncoder passwordEncoder;
 
     @Value("${AUTH_SERVER_PROTOCOL:http}")
     private String authorizationServerProtocol;
@@ -50,13 +53,15 @@ public final class UserService {
     private int authorizationServerPort;
 
     @Autowired
-    public UserService(UserRepository userRepository, ActivationTokenRepository activationTokenRepository, EmailService emailService, RestTemplate restTemplate, HttpHeaderHelper httpHeaderHelper, ConversionService conversionService) {
+    public UserService(UserRepository userRepository, ActivationTokenRepository activationTokenRepository, ResetTokenRepository resetTokenRepository, EmailService emailService, RestTemplate restTemplate, HttpHeaderHelper httpHeaderHelper, PasswordEncoder passwordEncoder, ConversionService conversionService) {
         this.userRepository = userRepository;
         this.activationTokenRepository = activationTokenRepository;
+        this.resetTokenRepository = resetTokenRepository;
         this.emailService = emailService;
         this.restTemplate = restTemplate;
         this.httpHeaderHelper = httpHeaderHelper;
         this.conversionService = conversionService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     private String buildAuthorizationServerURL() {
@@ -105,5 +110,30 @@ public final class UserService {
             user.ifPresent(value -> value.set_enabled(true));
             activationTokenRepository.delete(token.get());
         }
+    }
+
+    public void forgotPassword(final String keyword) {
+        final User user = userRepository.findByUsernameEqualsOrEmailEquals(keyword, keyword)
+                .orElseThrow(() -> new BadRequestException("User not found!"));
+
+        final ResetToken resetToken = ResetToken.builder()
+                .token(UUID.randomUUID().toString())
+                .userId(user.getId())
+                .build();
+
+        resetTokenRepository.save(resetToken);
+        emailService.sendResetEmail(user.getEmail(), user.getId(), resetToken.getToken());
+    }
+
+    public void resetPassword(ResetPasswordRequestDTO passwordRequestDTO) {
+        final User user = userRepository.findById(passwordRequestDTO.getUserId())
+                .orElseThrow(() -> new BadRequestException("User not found!"));
+
+        final ResetToken resetToken = resetTokenRepository.findByTokenEquals(passwordRequestDTO.getToken())
+                .orElseThrow(() -> new BadRequestException("Token not found!"));
+
+        user.setPassword(passwordEncoder.encode(passwordRequestDTO.getPassword()));
+        userRepository.save(user);
+        resetTokenRepository.delete(resetToken);
     }
 }

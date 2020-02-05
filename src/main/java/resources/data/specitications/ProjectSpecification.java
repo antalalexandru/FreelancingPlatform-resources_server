@@ -54,10 +54,13 @@ public class ProjectSpecification implements Specification<Project> {
         }
 
         if (searchCriteria.getOperation().equalsIgnoreCase(":")) {
+            if (searchCriteria.getKey().equalsIgnoreCase("authorName")) {
+                return root.join("author").get("username").in(searchCriteria.getValue());
+            }
             if (root.get(searchCriteria.getKey()).getJavaType() == Set.class) {
-                System.out.println(" !!!!! checking ");
                 return root.join("tags").get("name").in(searchCriteria.getValue());
             }
+
             return criteriaBuilder.equal(root.get(searchCriteria.getKey()), searchCriteria.getValue());
         }
         return null;
