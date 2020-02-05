@@ -13,9 +13,9 @@ public class EmailService {
     private String defaultActivationMessage;
     @Value("${spring.mail.default-subject}")
     private String defaultActivationSubject;
-    @Value("${activation.default-message}")
+    @Value("${reset.default-message}")
     private String defaultResetMessage;
-    @Value("${activation.default-subject}")
+    @Value("${reset.default-subject}")
     private String defaultResetSubject;
 
     public JavaMailSender emailSender;
@@ -28,7 +28,7 @@ public class EmailService {
     @Async
     public void sendActivationEmail(String to, Long userId, String token) {
         SimpleMailMessage message = new SimpleMailMessage();
-        String body = defaultActivationMessage + " userID = " + userId + " token = " + token;
+        String body = defaultActivationMessage + " http://localhost:8080/activate_account?userId=" + userId + "&token=" + token;
         message.setTo(to);
         message.setSubject(defaultActivationSubject);
         message.setText(body);
@@ -38,7 +38,7 @@ public class EmailService {
     @Async
     public void sendResetEmail(String to, Long userId, String token) {
         SimpleMailMessage message = new SimpleMailMessage();
-        String body = defaultResetMessage + " userID = " + userId + " token = " + token;
+        String body = defaultResetMessage + " http://localhost:8080/reset_account?userId=" + userId + "&token=" + token;
         message.setTo(to);
         message.setSubject(defaultResetSubject);
         message.setText(body);
