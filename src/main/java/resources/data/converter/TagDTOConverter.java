@@ -12,6 +12,9 @@ public class TagDTOConverter implements Converter<TagDTO, Tag> {
         if (source == null) {
             return null;
         }
-        return new Tag(source.getId(), source.getName());
+        Tag tag = new Tag();
+        tag.setId(source.getId());
+        tag.setName(source.getName());
+        return tag;
     }
 }

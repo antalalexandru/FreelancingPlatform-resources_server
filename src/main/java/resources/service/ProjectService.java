@@ -104,16 +104,16 @@ public class ProjectService extends AuthenticationAwareService {
         }
 
         if (project.getAuthor().getId() == applicationDTO.getUser().getId()) {
-            throw new RuntimeException("You cannot apply to your own projects o.O!");
+            throw new RuntimeException("You cannot apply to your own projects!");
         }
 
         Application savedApplication = applicationRepository.save(applicationDTOConverter.convert(applicationDTO));
+        projectRepository.incrementProjectEnrolled(projectId);
         return applicationConverter.convert(savedApplication);
     }
 
     @Transactional(readOnly = true)
     public PaginatedResponse<ApplicationDTO> getProjectApplications(long projectId, int page, int count) {
-        // TODO actually do sort by date desc
         List<ApplicationDTO> applications = applicationRepository
                 .findByProjectIdEqualsOrderByDateDesc(projectId, PageRequest.of(page - 1, count))
                 .stream()
@@ -150,5 +150,22 @@ public class ProjectService extends AuthenticationAwareService {
         if (applicationRepository.countAllByProjectIdEqualsAndUserIdEquals(projectId, authenticatedUserId) > 0) {
             throw new BadRequestException("You already applied to this project.");
         }
+    }
+
+    @Transactional
+    public ProjectDTO selectProjectApplication(long projectId, long applicationId) {
+        Project project = projectRepository.findByIdEquals(projectId).orElseThrow(() -> new BadRequestException("Project does not exist!"));
+        if (project.getAuthor().getId() != getAuthenticatedUserDTO().getId()) {
+            throw new BadRequestException("Access denied!");
+        }
+        Application application = applicationRepository.findByIdEquals(applicationId).orElseThrow(() -> new BadRequestException("Application does not exist!"));
+        project.setSelectedApplication(application);
+        return projectConverter.convert(projectRepository.save(project));
+    }
+
+    @Transactional
+    public void deleteProject(long projectId) {
+        Project project = projectRepository.findByIdEquals(projectId).orElseThrow(() -> new BadRequestException("Project does not exist!"));
+        projectRepository.delete(project);
     }
 }

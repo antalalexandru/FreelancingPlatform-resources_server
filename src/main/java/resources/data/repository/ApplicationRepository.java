@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import resources.data.entity.Application;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ApplicationRepository extends JpaRepository<Application, Long>, JpaSpecificationExecutor<Application> {
 
@@ -18,4 +19,6 @@ public interface ApplicationRepository extends JpaRepository<Application, Long>,
     }
 
     long countAllByProjectIdEqualsAndUserIdEquals(long projectId, long userId);
+
+    Optional<Application> findByIdEquals(long id);
 }

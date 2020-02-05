@@ -33,10 +33,8 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
     private String name;
 
-    @Column
     private String description;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -51,7 +49,6 @@ public class Project {
     @JoinColumn(name = "author_id")
     private User author;
 
-    @Column
     private long enrolled;
 
     @Column(name = "payment_lower_bound")
@@ -60,7 +57,6 @@ public class Project {
     @Column(name = "payment_upper_bound")
     private long paymentUpperBound;
 
-    @Column
     private Date submitted;
 
     @Column(name = "end_date")

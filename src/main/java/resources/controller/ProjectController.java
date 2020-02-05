@@ -2,6 +2,7 @@ package resources.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,6 +51,12 @@ public class ProjectController {
         return projectService.getProjectDetails(id);
     }
 
+    @DeleteMapping("{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteProject(@PathVariable("id") long projectId) {
+        projectService.deleteProject(projectId);
+    }
+
     @PostMapping("{id}/application")
     @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")
     public ApplicationDTO applyToProject(@PathVariable("id") long projectId, @RequestBody @Valid ApplicationDTO applicationDTO) {
@@ -70,4 +77,12 @@ public class ProjectController {
     public void checkIfAbleToPost(@PathVariable("id") long projectId) {
         projectService.checkIfAbleToApply(projectId);
     }
+
+    @PostMapping("{project_id}/select_application/{application_id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MEMBER')")
+    public ProjectDTO selectProjectApplication(@PathVariable("project_id") long projectId, @PathVariable("application_id") long applicationId) {
+        return projectService.selectProjectApplication(projectId, applicationId);
+    }
+
+
 }

@@ -19,15 +19,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column
     private String username;
 
-    @Column
     @ToString.Exclude
     @JsonProperty(access = WRITE_ONLY)
     private String password;
 
-    @Column
     @ToString.Exclude
     @JsonProperty(access = WRITE_ONLY)
     private String email;
@@ -36,7 +33,6 @@ public class User {
     @JoinColumn(name = "group_id")
     private Group group;
 
-    @Column
     @ToString.Exclude
     @JsonProperty(access = WRITE_ONLY)
     private boolean is_enabled;

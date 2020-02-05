@@ -47,5 +47,6 @@ public class ProjectDTO {
     @JsonProperty(access = READ_ONLY)
     private Date submitted;
 
+    @FutureOrPresent
     private Date endDate;
 }
