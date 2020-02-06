@@ -49,4 +49,6 @@ public class ProjectDTO {
 
     @FutureOrPresent
     private Date endDate;
+
+    private ApplicationDTO selectedApplication;
 }

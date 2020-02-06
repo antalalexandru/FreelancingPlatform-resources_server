@@ -29,7 +29,4 @@ public class Tag {
 
     @Column
     private String name;
-
-    @ManyToMany(mappedBy = "tags")
-    private Set<Project> projects;
 }

@@ -1,5 +1,6 @@
 package resources.data.converter;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 import resources.data.dto.ProjectDTO;
@@ -13,6 +14,8 @@ public class ProjectConverter implements Converter<Project, ProjectDTO> {
 
     private final TagConverter tagConverter;
     private final UserConverter userConverter;
+    @Autowired
+    private ApplicationConverter applicationConverter;
 
     public ProjectConverter(TagConverter tagConverter, UserConverter userConverter) {
         this.tagConverter = tagConverter;
@@ -37,6 +40,7 @@ public class ProjectConverter implements Converter<Project, ProjectDTO> {
                 .paymentLowerBound(project.getPaymentLowerBound())
                 .paymentUpperBound(project.getPaymentUpperBound())
                 .enrolled(project.getEnrolled())
+                .selectedApplication(applicationConverter.convert(project.getSelectedApplication()))
                 .build();
     }
 }
